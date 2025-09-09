@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 )
 
@@ -96,28 +95,16 @@ func answerCallbackQuery(CallbackQueryId string, Text string) error {
 		Text:            Text,
 	}
 
-	reqBytes, err := json.Marshal(res)
+	err := setPost("answercallbackquery", res)
 	if err != nil {
 		return err
-	}
-
-	resp, err := http.Post(URL_API+TOKEN+"/answercallbackquery", "application/json", bytes.NewBuffer(reqBytes))
-	if err != nil {
-		fmt.Println(61)
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New("unexpected status" + resp.Status)
 	}
 
 	return err
 }
 
 func sendMessage(ChatID int64, Text string) error {
-	reqBody := &SendMessageBody{
+	res := &SendMessageBody{
 		ChatID:    ChatID,
 		Text:      Text,
 		ParseMode: "html",
@@ -128,21 +115,9 @@ func sendMessage(ChatID int64, Text string) error {
 		},
 	}
 
-	reqBytes, err := json.Marshal(reqBody)
+	err := setPost("sendMessage", res)
 	if err != nil {
 		return err
-	}
-
-	resp, err := http.Post(URL_API+TOKEN+"/sendMessage", "application/json", bytes.NewBuffer(reqBytes))
-	if err != nil {
-		fmt.Println(61)
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New("unexpected status" + resp.Status)
 	}
 
 	return err
@@ -160,29 +135,10 @@ func setWebhook() error {
 		AllowedUpdates: string(jsonData),
 	}
 
-	buf, err := json.Marshal(setWebhook)
+	err = setPost("setWebhook", setWebhook)
 	if err != nil {
 		return err
 	}
-
-	resp, err := http.Post(URL_API+TOKEN+"/setWebhook", "application/json", bytes.NewBuffer(buf))
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return errors.New("unexpected status" + resp.Status)
-	}
-
-	req := map[string]interface{}{}
-	err = json.NewDecoder(resp.Body).Decode(&req)
-	if err != nil {
-		return err
-	}
-
-	Pc(3, req)
 
 	return err
 }
@@ -211,12 +167,25 @@ func setMyCommands() error {
 		"commands": string(jsonData),
 	}
 
-	buf, err := json.Marshal(BotCommand)
+	err = setPost("setMyCommands", BotCommand)
 	if err != nil {
 		return err
 	}
 
-	resp, err := http.Post(URL_API+TOKEN+"/setMyCommands", "application/json", bytes.NewBuffer(buf))
+	return err
+}
+
+// return post from URL method
+func setPost(method string, data any) error {
+	buf, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	urlPost := URL_API + TOKEN
+	urlPost += "/" + method
+
+	resp, err := http.Post(urlPost, "application/json", bytes.NewBuffer(buf))
 	if err != nil {
 		return err
 	}
@@ -233,10 +202,10 @@ func setMyCommands() error {
 		return err
 	}
 
-	Pc(3, req)
+	Pc(2, req)
 
 	// for k, v := range req {
-	// 	Pc(3, k, " / ", v)
+	// 	Pc(2, k, " / ", v)
 	// }
 
 	return err
