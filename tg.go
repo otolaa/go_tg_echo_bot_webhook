@@ -85,6 +85,11 @@ type AnswerCallbackQuery struct {
 	Text            string `json:"text"`
 }
 
+type BotCommand struct {
+	Command     string `json:"command"`
+	Description string `json:"description"`
+}
+
 func answerCallbackQuery(CallbackQueryId string, Text string) error {
 	res := &AnswerCallbackQuery{
 		CallbackQueryId: CallbackQueryId,
@@ -177,7 +182,62 @@ func setWebhook() error {
 		return err
 	}
 
-	fmt.Println(req)
+	Pc(3, req)
+
+	return err
+}
+
+func setMyCommands() error {
+
+	commands := []BotCommand{}
+	commanStart := BotCommand{
+		Command:     "start",
+		Description: "🚀 The start bot",
+	}
+
+	commanVersion := BotCommand{
+		Command:     "version",
+		Description: "👾 version bot",
+	}
+
+	commands = append(commands, commanStart, commanVersion)
+
+	jsonData, err := json.Marshal(commands)
+	if err != nil {
+		return err
+	}
+
+	BotCommand := &map[string]string{
+		"commands": string(jsonData),
+	}
+
+	buf, err := json.Marshal(BotCommand)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(URL_API+TOKEN+"/setMyCommands", "application/json", bytes.NewBuffer(buf))
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("unexpected status " + resp.Status)
+	}
+
+	req := map[string]interface{}{}
+	err = json.NewDecoder(resp.Body).Decode(&req)
+	if err != nil {
+		return err
+	}
+
+	Pc(3, req)
+
+	// for k, v := range req {
+	// 	Pc(3, k, " / ", v)
+	// }
 
 	return err
 }

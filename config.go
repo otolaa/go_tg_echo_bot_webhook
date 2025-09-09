@@ -5,17 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
-)
-
-var (
-	TOKEN string
-	URL   string
 )
 
 const (
 	VERSION string = "0.0.1"
 	URL_API string = "https://api.telegram.org/bot"
+	SUFFIX  string = "~"
+)
+
+var (
+	TOKEN      string
+	URL        string
+	SuffixLine string = strings.Repeat(SUFFIX, 39)
 )
 
 func init() {
@@ -43,6 +46,11 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = setMyCommands()
+	if err != nil {
+		panic(err)
+	}
 }
 
 // write to files
@@ -59,4 +67,10 @@ func writeJson(data any, filename string) error {
 
 	fmt.Printf("JSON data write to file ~ %s\n", filename)
 	return nil
+}
+
+// color: 1 red, 2 green, 3 yello, 4 blue, 5 purple, 6 blue
+func Pc(color int, str ...any) {
+	SuffixColor := "\033[3" + strconv.Itoa(color) + "m"
+	fmt.Printf("%s%s%s", SuffixColor, fmt.Sprint(str...), "\033[0m\n")
 }

@@ -78,12 +78,13 @@ func showTg(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println(TOKEN)
-	fmt.Println(URL)
+	Pc(4, TOKEN)
+	Pc(4, URL)
+	Pc(4, SuffixLine)
 
 	http.HandleFunc("/", showStart)
 	http.HandleFunc("/"+TOKEN, showTg)
-	fmt.Println("Server starting on :8080...")
+	Pc(3, "Server starting on :8080...")
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
