@@ -12,6 +12,7 @@ func showJsonData(w http.ResponseWriter, r *http.Request) {
 		Result:  true,
 		Version: VERSION,
 		Error:   false,
+		Method:  r.Method,
 	}
 
 	jsonData, _ := json.Marshal(dataStart)
@@ -27,6 +28,7 @@ func show404(w http.ResponseWriter, r *http.Request) {
 		Result:  false,
 		Version: VERSION,
 		Error:   true,
+		Method:  r.Method,
 	}
 
 	json404, _ := json.Marshal(data404)
@@ -58,23 +60,55 @@ func showTg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if data.CallbackQuery.Data != "" {
-		err = answerCallbackQuery(data.CallbackQuery.ID, data.CallbackQuery.Data)
-		if err != nil {
-			fmt.Println("73 → Error:", err)
-			return
-		}
-	}
-
-	if data.Message.Text != "" {
-		err = sendMessage(data.Message.Chat.Id, data.Message.Text)
-		if err != nil {
-			fmt.Println("81 → Error:", err)
-			return
-		}
-	}
+	handleCallbackQuery(&data)
+	handleMessage(&data)
 
 	showJsonData(w, r)
+}
+
+func handleCallbackQuery(data *BotMessage) {
+	if data.CallbackQuery.Data == "" {
+		return
+	}
+
+	err := answerCallbackQuery(data.CallbackQuery.ID, data.CallbackQuery.Data)
+	if err != nil {
+		fmt.Println("73 → Error:", err)
+		return
+	}
+}
+
+func handleMessage(data *BotMessage) {
+	if data.Message.Text == "" {
+		return
+	}
+
+	Pc(2, data.Message.Chat.Id, " ~ ", data.Message.From.Username, " ~ ", data.Message.Text)
+
+	LineKeyboard := InlineKeyboard{}
+	MessageText := data.Message.Text
+
+	if data.Message.Text == "/start" {
+		LineKeyboard = InlineKeyboard{
+			{{"понятно", "clear"}, {"неясно", "unclear"}},
+		}
+
+		MessageText = "Это тестовый бот для моделей ~ tg.go"
+	}
+
+	if data.Message.Text == "/version" {
+		MessageText = "версия бота: " + VERSION
+	}
+
+	Markup := ReplyMarkup{
+		InlineKeyboard: LineKeyboard,
+	}
+
+	err := sendMessage(data.Message.Chat.Id, MessageText, Markup)
+	if err != nil {
+		fmt.Println("81 → Error:", err)
+		return
+	}
 }
 
 func main() {

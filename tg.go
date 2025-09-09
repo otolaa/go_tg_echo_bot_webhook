@@ -12,6 +12,7 @@ type DataStart struct {
 	Result  bool   `json:"result"`
 	Version string `json:"version"`
 	Error   bool   `json:"error"`
+	Method  string `json:"metod"`
 }
 
 type From struct {
@@ -103,16 +104,12 @@ func answerCallbackQuery(CallbackQueryId string, Text string) error {
 	return err
 }
 
-func sendMessage(ChatID int64, Text string) error {
+func sendMessage(ChatID int64, Text string, Markup ReplyMarkup) error {
 	res := &SendMessageBody{
-		ChatID:    ChatID,
-		Text:      Text,
-		ParseMode: "html",
-		ReplyMarkup: ReplyMarkup{
-			InlineKeyboard: InlineKeyboard{
-				{{"понятно", "clear"}, {"неясно", "unclear"}},
-			},
-		},
+		ChatID:      ChatID,
+		Text:        Text,
+		ParseMode:   "html",
+		ReplyMarkup: Markup,
 	}
 
 	err := setPost("sendMessage", res)
@@ -202,10 +199,10 @@ func setPost(method string, data any) error {
 		return err
 	}
 
-	Pc(2, req)
+	// Pc(2, req)
 
 	// for k, v := range req {
-	// 	Pc(2, k, " / ", v)
+	// 	Pc(2, k, " ~ ", v)
 	// }
 
 	return err
