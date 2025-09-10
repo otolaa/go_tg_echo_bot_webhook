@@ -70,7 +70,7 @@ func writeJson(data any, filename string) error {
 }
 
 // color: 1 red, 2 green, 3 yello, 4 blue, 5 purple, 6 blue
-func Pc(color int, str ...any) {
+func p(color int, str ...any) {
 	SuffixColor := "\033[3" + strconv.Itoa(color) + "m"
 	fmt.Printf("%s%s%s", SuffixColor, fmt.Sprint(str...), "\033[0m\n")
 }

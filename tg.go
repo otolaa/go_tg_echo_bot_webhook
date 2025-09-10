@@ -199,10 +199,10 @@ func setPost(method string, data any) error {
 		return err
 	}
 
-	// Pc(2, req)
+	// p(2, req)
 
 	// for k, v := range req {
-	// 	Pc(2, k, " ~ ", v)
+	// 	p(2, k, " ~ ", v)
 	// }
 
 	return err

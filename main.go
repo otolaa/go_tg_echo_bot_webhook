@@ -83,7 +83,7 @@ func handleMessage(data *BotMessage) {
 		return
 	}
 
-	Pc(2, data.Message.Chat.Id, " ~ ", data.Message.From.Username, " ~ ", data.Message.Text)
+	p(2, data.Message.Chat.Id, " ~ ", data.Message.From.Username, " ~ ", data.Message.Text)
 
 	LineKeyboard := InlineKeyboard{}
 	MessageText := data.Message.Text
@@ -112,13 +112,13 @@ func handleMessage(data *BotMessage) {
 }
 
 func main() {
-	Pc(4, TOKEN)
-	Pc(4, URL)
-	Pc(4, SuffixLine)
+	p(4, TOKEN)
+	p(4, URL)
+	p(4, SuffixLine)
 
 	http.HandleFunc("/", showStart)
 	http.HandleFunc("/"+TOKEN, showTg)
-	Pc(3, "Server starting on :8080...")
+	p(3, "Server starting on :8080...")
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
